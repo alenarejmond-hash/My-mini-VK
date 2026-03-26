@@ -308,14 +308,9 @@ const OrderForm = ({ onClose, onSuccess, isLightTheme, triggerHaptic }) => {
       if (onSuccess) onSuccess(); // Сообщаем главному компоненту, что всё прошло супер!
       triggerHaptic('notification', 'success');
       
-      // Разблокируем экран, всегда закрывая модалку через 3 секунды
+      // Разблокируем экран, закрывая ТОЛЬКО модалку через 3 секунды
       setTimeout(() => {
-        onClose(); // 👈 Всегда убираем "невидимую стену", мешающую кликать!
-        try {
-          window.vkBridge?.send('VKWebAppClose', { status: 'success' }).catch(() => {});
-        } catch (e) {
-          // ignore
-        }
+        onClose(); // 👈 Убираем окошко успеха, пользователь остается в мини-аппе
       }, 3000);
     } catch (error) {
       console.error("Ошибка отправки:", error);
@@ -1097,8 +1092,8 @@ export default function App() {
               className={`absolute inset-0 backdrop-blur-[30px] rounded-3xl p-6 flex flex-col items-center justify-between transition-all duration-700 w-full h-full ${isLightTheme ? 'bg-[#1A080C]/90 border-[0.5px] border-[#D8A0A6]/40 shadow-[0_30px_60px_rgba(216,160,166,0.2)]' : 'bg-[#0a0a0a]/90 border-[0.5px] border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.6)]'} ${isShareFlipped ? 'pointer-events-auto' : 'pointer-events-none'}`}
               style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)', transformStyle: 'preserve-3d' }}
             >
-              <div className="absolute inset-0 z-0 opacity-20 pointer-events-none rounded-3xl overflow-hidden" style={{ transform: 'translateZ(-1px)' }}>
-                <img src={CONFIG.heroPhoto} alt="bg" className="w-full h-full object-cover grayscale blur-sm" />
+              <div className="absolute inset-0 z-0 opacity-20 pointer-events-none rounded-3xl overflow-hidden">
+                <img src={CONFIG.heroPhoto} alt="bg" className="w-full h-full object-cover grayscale blur-sm scale-110" />
                 <div className={`absolute inset-0 ${isLightTheme ? 'bg-gradient-to-t from-[#1A080C] via-[#1A080C]/80 to-transparent' : 'bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent'}`}></div>
               </div>
 
