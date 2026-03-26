@@ -53,7 +53,7 @@ const CONFIG = {
 
   // 💥 ИНТЕГРАЦИЯ С GOOGLE SHEETS (ЗАКАЗЫ) 💥
   // 👈 ВСТАВЬТЕ СЮДА ССЫЛКУ НА СКРИПТ ДЛЯ ЗАКАЗОВ (куда будут падать заявки)
-  googleOrderScriptUrl: "https://script.google.com/macros/s/AKfycbyHNc08of2Xf7ETl92MY833NTSNE20aK5xncdsrt2CFw9BqGwtfK8VusHA4RNPMV1M/exec",
+  googleOrderScriptUrl: "https://script.google.com/macros/s/AKfycbyODfBiUhouFDFIuJjvwafRrMqIn5IZ53-ViFF2LdVRQ7R2d0bh6ZTbTZMeXyUj4QTR6Q/exec",
 
   // 6. Галерея (Мои работы) - ТЕПЕРЬ С ПОДДЕРЖКОЙ ВИДЕО И ФОТО!
   // 👇 ПОДСКАЗКА ОТ ИИ:
@@ -756,6 +756,9 @@ export default function App() {
         if (!window.vkBridge) throw new Error("VK Bridge timeout");
 
         await window.vkBridge.send('VKWebAppInit');
+        
+        // Отключаем нативный свайп "назад/закрыть" на iOS, чтобы приложение не закрывалось случайно
+        window.vkBridge.send('VKWebAppDisableSwipeBack').catch(() => {});
         
         // Синхронизируем цвета шапки при старте
         const bgColor = isLightTheme ? '#150508' : '#050505';
@@ -1824,4 +1827,3 @@ export default function App() {
     </div>
   );
 }
-
