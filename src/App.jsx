@@ -53,7 +53,7 @@ const CONFIG = {
 
   // 💥 ИНТЕГРАЦИЯ С GOOGLE SHEETS (ЗАКАЗЫ) 💥
   // 👈 ВСТАВЬТЕ СЮДА ССЫЛКУ НА СКРИПТ ДЛЯ ЗАКАЗОВ (куда будут падать заявки)
-  googleOrderScriptUrl: "https://script.google.com/macros/s/AKfycbwRBK3iJPULbTggqDsVNflD0Tn9Gvjib3kw67D0MrtIDbBupxcnd9zbivsC0AaCP69_/exec",
+  googleOrderScriptUrl: "https://script.google.com/macros/s/AKfycbyeIiUSoqaBNoVVaGpnAkV67VDehc7W-ypNasMAZDU-hQo6tJiZhTUQ3_WzIF8fUqB0/exec",
 
   // 6. Галерея (Мои работы) - ТЕПЕРЬ С ПОДДЕРЖКОЙ ВИДЕО И ФОТО!
   // 👇 ПОДСКАЗКА ОТ ИИ:
