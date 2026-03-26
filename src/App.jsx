@@ -451,6 +451,7 @@ export default function App() {
   const canvasRef = useRef(null);
   const particlesRef = useRef([]);
   const ripplesRef = useRef([]);
+  const smallDotsRef = useRef([]);
   
   // State for Loading Spinner
   const [isAppLoading, setIsAppLoading] = useState(true);
@@ -822,8 +823,36 @@ export default function App() {
       }
     }
 
+    if (smallDotsRef.current.length === 0) {
+      for (let i = 0; i < 40; i++) {
+        smallDotsRef.current.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: (Math.random() - 0.5) * 1.5,
+          radius: Math.random() * 1.5 + 0.5,
+          alpha: Math.random() * 0.4 + 0.1
+        });
+      }
+    }
+
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      smallDotsRef.current.forEach(dot => {
+        dot.x += dot.vx;
+        dot.y += dot.vy;
+
+        if (dot.x < -dot.radius) dot.x = canvas.width + dot.radius;
+        if (dot.x > canvas.width + dot.radius) dot.x = -dot.radius;
+        if (dot.y < -dot.radius) dot.y = canvas.height + dot.radius;
+        if (dot.y > canvas.height + dot.radius) dot.y = -dot.radius;
+
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
+        ctx.fillStyle = themeRef.current ? `rgba(216, 160, 166, ${dot.alpha})` : `rgba(255, 255, 255, ${dot.alpha})`;
+        ctx.fill();
+      });
 
       particlesRef.current.forEach(p => {
         const dx = pointerPos.current.x - p.x;
