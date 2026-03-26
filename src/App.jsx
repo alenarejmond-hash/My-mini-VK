@@ -260,7 +260,7 @@ const TermsModal = ({ onClose, isLightTheme, triggerHaptic }) => {
   );
 };
 
-const OrderForm = ({ onClose, isLightTheme, triggerHaptic }) => {
+const OrderForm = ({ onClose, onSuccess, isLightTheme, triggerHaptic }) => {
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     defaultValues: { tariff: 'Pro', domain: false }
   });
@@ -305,14 +305,16 @@ const OrderForm = ({ onClose, isLightTheme, triggerHaptic }) => {
       }
       
       setIsSuccess(true);
+      if (onSuccess) onSuccess(); // Сообщаем главному компоненту, что всё прошло супер!
       triggerHaptic('notification', 'success');
       
-      // Закрываем VK Mini App после успешной заявки
+      // Разблокируем экран, всегда закрывая модалку через 3 секунды
       setTimeout(() => {
+        onClose(); // 👈 Всегда убираем "невидимую стену", мешающую кликать!
         try {
-          window.vkBridge?.send('VKWebAppClose', { status: 'success' }).catch(() => onClose());
+          window.vkBridge?.send('VKWebAppClose', { status: 'success' }).catch(() => {});
         } catch (e) {
-          onClose();
+          // ignore
         }
       }, 3000);
     } catch (error) {
@@ -533,6 +535,8 @@ export default function App() {
 
   // State for Order Modal
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  // НОВОЕ: состояние блокировки главной кнопки после отправки брифа
+  const [isOrderSubmitted, setIsOrderSubmitted] = useState(false);
 
   // State for Privacy Modal
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
@@ -1494,16 +1498,22 @@ export default function App() {
           <button 
             onClick={(e) => {
               e.stopPropagation();
+              if (isOrderSubmitted) return; // 👈 Не даем открыть форму снова, если уже отправлено
               triggerHaptic('impact', 'medium');
               setIsOrderModalOpen(true);
             }}
-            className={`group relative w-full h-16 rounded-2xl backdrop-blur-[20px] border-[0.5px] flex items-center justify-center gap-3 transition-all duration-500 active:scale-[0.98] overflow-hidden mb-8 ${isLightTheme ? 'bg-[#D8A0A6]/10 hover:bg-[#D8A0A6]/20 border-[#D8A0A6]/30 shadow-[0_10px_40px_rgba(216,160,166,0.15)]' : 'bg-white/[0.05] hover:bg-white/[0.1] border-white/20 shadow-[0_10px_40px_rgba(255,255,255,0.03)]'}`}
+            disabled={isOrderSubmitted}
+            className={`group relative w-full h-16 rounded-2xl backdrop-blur-[20px] border-[0.5px] flex items-center justify-center gap-3 transition-all duration-500 overflow-hidden mb-8 ${isOrderSubmitted ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.98]'} ${isLightTheme ? 'bg-[#D8A0A6]/10 hover:bg-[#D8A0A6]/20 border-[#D8A0A6]/30 shadow-[0_10px_40px_rgba(216,160,166,0.15)]' : 'bg-white/[0.05] hover:bg-white/[0.1] border-white/20 shadow-[0_10px_40px_rgba(255,255,255,0.03)]'}`}
           >
-            <div className={`absolute inset-0 transition-transform duration-1000 translate-x-[-100%] group-hover:translate-x-[100%] ${isLightTheme ? 'bg-gradient-to-r from-transparent via-[#D8A0A6]/30 to-transparent' : 'bg-gradient-to-r from-transparent via-white/10 to-transparent'}`}></div>
+            <div className={`absolute inset-0 transition-transform duration-1000 translate-x-[-100%] ${!isOrderSubmitted ? 'group-hover:translate-x-[100%]' : ''} ${isLightTheme ? 'bg-gradient-to-r from-transparent via-[#D8A0A6]/30 to-transparent' : 'bg-gradient-to-r from-transparent via-white/10 to-transparent'}`}></div>
             <span className={`text-[13px] uppercase tracking-[0.2em] font-medium relative z-10 transition-colors duration-700 ${isLightTheme ? 'text-[#F5ECEE]' : 'text-white/90'}`}>
-              {CONFIG.ctaText}
+              {isOrderSubmitted ? 'Бриф отправлен' : CONFIG.ctaText}
             </span>
-            <ArrowRight className={`w-4 h-4 relative z-10 group-hover:translate-x-1 transition-all ${isLightTheme ? 'text-[#F5ECEE]/80' : 'text-white/70'}`} strokeWidth={1.5} />
+            {!isOrderSubmitted ? (
+              <ArrowRight className={`w-4 h-4 relative z-10 group-hover:translate-x-1 transition-all ${isLightTheme ? 'text-[#F5ECEE]/80' : 'text-white/70'}`} strokeWidth={1.5} />
+            ) : (
+              <Check className={`w-4 h-4 relative z-10 ${isLightTheme ? 'text-[#F5ECEE]/80' : 'text-white/70'}`} strokeWidth={1.5} />
+            )}
           </button>
 
           <div className="text-center">
@@ -1778,6 +1788,7 @@ export default function App() {
         {isOrderModalOpen && (
           <OrderForm 
             onClose={() => setIsOrderModalOpen(false)} 
+            onSuccess={() => setIsOrderSubmitted(true)}
             isLightTheme={isLightTheme} 
             triggerHaptic={triggerHaptic} 
           />
