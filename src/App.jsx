@@ -723,7 +723,7 @@ export default function App() {
   const scrollLeftReviews = useRef(0);
 
   // Отступ для Hero-блока в зависимости от платформы (для ВК делаем с запасом на их шапку)
-  const [heroPadding, setHeroPadding] = useState('pt-24');
+  const [heroPadding, setHeroPadding] = useState('pt-12');
 
   useEffect(() => {
     const preventZoom = (e) => {
@@ -769,11 +769,11 @@ export default function App() {
         }).catch(() => {});
         
         setIsVK(true);
-        setHeroPadding('pt-20'); // Оптимальный отступ для ВК
+        setHeroPadding('pt-10'); // Оптимальный отступ для ВК
       } catch (error) {
         console.error('VK Bridge Init Error:', error);
         setIsVK(false);
-        setHeroPadding('pt-10'); // Фолбэк для браузера
+        setHeroPadding('pt-4'); // Фолбэк для браузера
       }
     };
     initVK();
