@@ -64,7 +64,7 @@ const CONFIG = {
     { title: "ШОУРИЛ 2026", icon: Compass, demoLink: "https://dzen.ru/" }, // Замените ссылку на свою
     { title: "БЛОГЕР", icon: Heart, demoLink: "https://vc.ru/" }, // Замените ссылку на свою
     { title: "РЕЖИССЁР", icon: Heart, demoLink: "https://ru.wikipedia.org/" }, // Замените ссылку на свою
-    { title: "ТУРАГЕНТ", icon: Flame, demoLink: "https://dzen.ru/" }, // Замените ссылку на свою
+    { title: "ТУРАГЕНТ", icon: Flame, demoLink: "https://github.com/alenarejmond-hash/schabl-turagent.git" }, // Замените ссылку на свою
     { title: "АВТОРСКИЕ ТУРЫ", icon: Star, demoLink: "https://vc.ru/" }, // Замените ссылку на свою
     { title: "ПСИХОЛОГ", icon: Camera, demoLink: "https://ru.wikipedia.org/" }, // Замените ссылку на свою
     { title: "ЭЗОРЕТИК", icon: Sparkles, demoLink: "https://dzen.ru/" }, // Замените ссылку на свою
