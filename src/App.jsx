@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { 
   Send, Fingerprint, Sparkles, Lock, Key, 
-  ArrowRight, Compass, Flame, Brain, Camera, Star, X, Sun, Moon, Play, Heart, Check, Loader2, Diamond, Mail, Image as ImageIcon
+  ArrowRight, Compass, Flame, Brain, Camera, Star, X, Sun, Moon, Play, Heart, Check, Loader2, Diamond, Mail, Image as ImageIcon, Maximize
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -55,23 +55,19 @@ const CONFIG = {
   // 👈 ВСТАВЬТЕ СЮДА ССЫЛКУ НА СКРИПТ ДЛЯ ЗАКАЗОВ (куда будут падать заявки)
   googleOrderScriptUrl: "https://script.google.com/macros/s/AKfycbyoSupm9t2iYd4cM_KEDFh_slZSwlnvPol8PvMWF8fS_HtlGzFeiQJ8_aihCuAi3zop/exec",
 
-  // 6. Галерея (Мои работы) - ТЕПЕРЬ С ПОДДЕРЖКОЙ ВИДЕО И ФОТО!
+  // 6. Галерея (Мои работы) - ТЕПЕРЬ ЖИВЫЕ ШАБЛОНЫ (LIVE DEMO)
   // 👇 ПОДСКАЗКА ОТ ИИ:
-  // title - Название проекта на карточке (например: "Шоурил 2024")
-  // desc - Короткое описание под названием (например: "Главное видео")
+  // title - Название проекта на карточке (минимализм, только суть)
   // icon - Иконка проекта (Можно писать: Compass, Heart, Flame, Star, Camera, Sparkles)
-  // videoLink - 👈 ВСТАВЬТЕ СЮДА ОБЫЧНУЮ ССЫЛКУ НА ВИДЕО (YouTube, Shorts или RuTube). Умный плеер сам её обработает!
-  // photoUrl - 👈 НОВАЯ НАСТРОЙКА: Ссылка на вертикальную картинку 9:16 (или список ссылок в квадратных скобках ['url1', 'url2'] для карусели)
-  // Если видео или фото пока нет, оставьте "demo1" для видео или удалите photoUrl. 
-  // У проектов может быть только видео, только фото, или и то и другое сразу!
+  // demoLink - 👈 ВСТАВЬТЕ СЮДА ССЫЛКУ НА ВАШ ШАБЛОН (загруженный на ваш хостинг)
   portfolio: [
-    { title: "ШОУРИЛ 2026", desc: "Лучшие моменты", icon: Compass, videoLink: "https://rutube.ru/video/611bc8031620c28329867b1943f4d0d9/", photoUrl: ["https://i.postimg.cc/fynZKtXQ/Snimok-ekrana-2026-03-25-v-3-18-48-PM.png"] },
-    { title: "БЛОГЕР", desc: "Для личного бренда", icon: Heart, videoLink: "https://rutube.ru/video/private/5bdad759aa605c05f6e898a43cfd1952/?p=jER4pWwVpw_JdHnkopPNOA", photoUrl: "https://i.postimg.cc/25XBpHvn/IMG-2353.png" },
-    { title: "РЕЖИССЁР", desc: "Хранительница традиций", icon: Heart, videoLink: "demo1", photoUrl: "https://i.postimg.cc/vBVTJGGb/IMG-2359.png" },
-    { title: "ТУРАГЕНТ", desc: "Экспертный подбор", icon: Flame, videoLink: "demo2" },
-    { title: "АВТОРСКИЕ ТУРЫ", desc: "Эмоции, маршруты, атмосфера", icon: Star, videoLink: "demo3", photoUrl: "https://i.postimg.cc/8zs37kJx/Snimok-ekrana-2026-03-25-v-3-17-55-PM.png" },
-    { title: "ПСИХОЛОГ", desc: "Запись на сессии, доверие", icon: Camera, photoUrl: "https://i.postimg.cc/R0GhWRGz/unnamed.jpg" },
-    { title: "ЭЗОРЕТИК", desc: "Расклады, консультации, эстетика", icon: Sparkles, videoLink: "demo5" },
+    { title: "ШОУРИЛ 2026", icon: Compass, demoLink: "https://dzen.ru/" }, // Замените ссылку на свою
+    { title: "БЛОГЕР", icon: Heart, demoLink: "https://vc.ru/" }, // Замените ссылку на свою
+    { title: "РЕЖИССЁР", icon: Heart, demoLink: "https://ru.wikipedia.org/" }, // Замените ссылку на свою
+    { title: "ТУРАГЕНТ", icon: Flame, demoLink: "https://dzen.ru/" }, // Замените ссылку на свою
+    { title: "АВТОРСКИЕ ТУРЫ", icon: Star, demoLink: "https://vc.ru/" }, // Замените ссылку на свою
+    { title: "ПСИХОЛОГ", icon: Camera, demoLink: "https://ru.wikipedia.org/" }, // Замените ссылку на свою
+    { title: "ЭЗОРЕТИК", icon: Sparkles, demoLink: "https://dzen.ru/" }, // Замените ссылку на свою
   ],
 
   // 7. Инвестиции (Тарифы) в стиле Apple Wallet
@@ -630,10 +626,8 @@ export default function App() {
     }
   }, []);
 
-  const [activeVideo, setActiveVideo] = useState(null);
-  const [activePhoto, setActivePhoto] = useState(null);
-  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
-  const [isMediaLoading, setIsMediaLoading] = useState(true);
+  const [expandedDemo, setExpandedDemo] = useState(null);
+  const [isDemoLoading, setIsDemoLoading] = useState(true);
 
   const [portfolioIndex, setPortfolioIndex] = useState(0);
   const touchStartX = useRef(0);
@@ -642,9 +636,6 @@ export default function App() {
   const portfolioRef = useRef(null);
   const isDraggingPortfolio = useRef(false);
   const wheelTimeoutRef = useRef(null);
-
-  const [onboardingStep, setOnboardingStep] = useState(0);
-  const hasTriggeredOnboarding = useRef(false);
 
   const handlePortfolioSwipe = () => {
     const swipeDistance = touchStartX.current - touchEndX.current;
@@ -691,31 +682,6 @@ export default function App() {
     el.addEventListener('wheel', handleWheel, { passive: false });
     return () => el.removeEventListener('wheel', handleWheel);
   }, [portfolioIndex, triggerHaptic]);
-
-  useEffect(() => {
-    const el = portfolioRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !hasTriggeredOnboarding.current) {
-          hasTriggeredOnboarding.current = true;
-          setOnboardingStep(1); 
-          
-          setTimeout(() => {
-            setOnboardingStep(2); 
-            setTimeout(() => {
-              setOnboardingStep(0); 
-            }, 3000);
-          }, 3000);
-        }
-      },
-      { threshold: 0.6 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   const reviewsRef = useRef(null);
   const isDraggingReviews = useRef(false);
@@ -1271,14 +1237,8 @@ export default function App() {
                     if (Math.abs(touchStartX.current - touchEndX.current) > 20) return;
                     if (isCenter) {
                       triggerHaptic('impact', 'light');
-                      if (item.videoLink) {
-                        setActiveVideo(item.videoLink);
-                        setIsMediaLoading(!item.videoLink.startsWith('demo'));
-                      } else if (item.photoUrl) {
-                        setActivePhoto(item.photoUrl);
-                        setActivePhotoIndex(0);
-                        setIsMediaLoading(true);
-                      }
+                      setExpandedDemo(item);
+                      setIsDemoLoading(true);
                     } else {
                       triggerHaptic('selection');
                       setPortfolioIndex(idx);
@@ -1287,67 +1247,19 @@ export default function App() {
                   style={{ transform, zIndex, opacity, pointerEvents }}
                   className={`absolute w-[200px] sm:w-[240px] h-[250px] sm:h-[280px] border rounded-[2rem] p-6 flex flex-col justify-between cursor-pointer transition-all duration-[400ms] ease-out group ${isLightTheme ? 'bg-[#1A080C]/90 border-[#D8A0A6]/30 shadow-[0_20px_50px_rgba(216,160,166,0.15)] backdrop-blur-xl' : 'bg-[#1a1a1a]/80 border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl'}`}
                 >
-                  {isCenter && item.videoLink && (
-                    <div className={`absolute inset-0 rounded-[2rem] flex items-center justify-center opacity-100 transition-opacity duration-300 z-10 ${isLightTheme ? 'bg-[#150508]/40 backdrop-blur-[1px]' : 'bg-black/10 backdrop-blur-[1px]'}`}>
-                      <div className={`w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border shadow-md transition-transform animate-pulse group-hover:scale-110 ${isLightTheme ? 'bg-[#D8A0A6]/10 border-[#D8A0A6]/20 text-[#D8A0A6]/80' : 'bg-white/10 border-white/10 text-white/60'}`}>
-                        <Play size={24} className="ml-1" fill="currentColor" />
+                  {isCenter && (
+                    <div className={`absolute inset-0 rounded-[2rem] flex items-center justify-center opacity-100 transition-opacity duration-300 z-10 ${isLightTheme ? 'bg-[#150508]/20 backdrop-blur-[2px]' : 'bg-black/20 backdrop-blur-[2px]'}`}>
+                      <div className={`w-16 h-16 rounded-full flex items-center justify-center backdrop-blur-md border shadow-2xl transition-transform animate-pulse group-hover:scale-110 ${isLightTheme ? 'bg-[#D8A0A6]/20 border-[#D8A0A6]/40 text-[#D8A0A6]' : 'bg-white/20 border-white/20 text-white'}`}>
+                        <Maximize size={24} strokeWidth={1.5} />
                       </div>
                     </div>
                   )}
-
-                  {isCenter && item.photoUrl && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation(); 
-                        triggerHaptic('impact', 'light');
-                        setActivePhoto(item.photoUrl);
-                        setActivePhotoIndex(0);
-                        setIsMediaLoading(true);
-                      }}
-                      className={`absolute top-5 right-5 z-30 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md border transition-transform hover:scale-110 active:scale-95 shadow-md ${isLightTheme ? 'bg-[#150508]/40 border-[#D8A0A6]/30 text-[#D8A0A6]' : 'bg-black/40 border-white/20 text-white/80'}`}
-                    >
-                      <ImageIcon size={18} />
-                    </button>
-                  )}
-
-                  <AnimatePresence>
-                    {isCenter && onboardingStep === 1 && item.photoUrl && (
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
-                        className="absolute -top-12 -right-10 flex flex-col items-center z-40 pointer-events-none drop-shadow-2xl"
-                      >
-                        <div className={`px-2 py-1 text-[11px] font-medium uppercase tracking-widest shadow-2xl mb-1 bg-transparent whitespace-nowrap ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white'}`}>
-                          Фото работ
-                        </div>
-                        <div className="flex items-center rotate-[135deg] translate-x-3 translate-y-2 animate-pulse drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                          <div className={`w-8 h-[2px] ${isLightTheme ? 'bg-[#D8A0A6]' : 'bg-white'}`}></div>
-                          <ArrowRight size={20} className={`-ml-2.5 ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white'}`} />
-                        </div>
-                      </motion.div>
-                    )}
-                    
-                    {isCenter && onboardingStep === 2 && item.videoLink && (
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
-                        className="absolute top-1/2 -left-[75px] sm:-left-[90px] -translate-y-1/2 flex items-center gap-1 z-40 pointer-events-none drop-shadow-2xl"
-                      >
-                        <div className={`text-[11px] font-medium uppercase tracking-widest shadow-2xl bg-transparent whitespace-nowrap ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white'}`}>
-                          Видео работ
-                        </div>
-                        <div className="flex items-center animate-pulse drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                          <div className={`w-12 sm:w-16 h-[2px] ${isLightTheme ? 'bg-[#D8A0A6]' : 'bg-white'}`}></div>
-                          <ArrowRight size={20} className={`-ml-2.5 ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white'}`} />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
 
                   <div className={`relative z-20 transition-colors duration-700 ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white/50'}`}>
                     <item.icon size={32} strokeWidth={1.5} />
                   </div>
                   <div className="relative z-20">
-                    <h3 className={`text-[13px] uppercase tracking-widest font-medium transition-colors duration-700 mb-1.5 ${isLightTheme ? 'text-[#F5ECEE]' : 'text-white'}`}>{item.title}</h3>
-                    <p className={`text-xs font-light transition-colors duration-700 ${isLightTheme ? 'text-[#F5ECEE]/60' : 'text-white/40'}`}>{item.desc}</p>
+                    <h3 className={`text-[13px] uppercase tracking-widest font-medium transition-colors duration-700 ${isLightTheme ? 'text-[#F5ECEE]' : 'text-white'}`}>{item.title}</h3>
                   </div>
                 </div>
               );
@@ -1368,7 +1280,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* --- 4. ТАРИФЫ (APPLE WALLET VIBE) --- */}
+        {/* --- 4. ТАРИФЫ (APPLE WALWAL VIBE) --- */}
         <section className="flex flex-col gap-6">
           <h2 className={`text-xs uppercase tracking-[0.3em] mb-2 transition-colors duration-700 ${isLightTheme ? 'text-[#D8A0A6]/50' : 'text-white/40'}`}>Тариф</h2>
           
@@ -1690,123 +1602,53 @@ export default function App() {
         </div>
       )}
 
-      {/* --- 7. MEDIA MODAL (RUTUBE ИЛИ ФОТО 9:16) --- */}
-      {(activeVideo || activePhoto) && (
-        <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-[30px] transition-all duration-700 ${isLightTheme ? 'bg-[#150508]/80' : 'bg-black/80'}`}>
-          
-          <button
-            onClick={() => {
-              triggerHaptic('impact', 'light');
-              setActiveVideo(null);
-              setActivePhoto(null);
-              setActivePhotoIndex(0);
-              setIsMediaLoading(true);
-            }}
-            // Отступ закрывающего крестика для VK сделан больше (top-24), чтобы не пересекаться с нативной шапкой VK
-            className={`absolute ${isVK ? 'top-24' : 'top-6 sm:top-8'} right-6 sm:right-8 z-[110] w-12 h-12 rounded-full flex items-center justify-center border backdrop-blur-md transition-all hover:scale-110 active:scale-95 shadow-xl ${isLightTheme ? 'bg-[#1A080C]/90 border-[#D8A0A6]/30 text-[#D8A0A6] shadow-[0_10px_30px_rgba(216,160,166,0.2)]' : 'bg-white/10 border-white/20 text-white hover:bg-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'}`}
+      {/* --- 7. DEMO MODAL (ЛИКВИДНЫЙ МОРФИНГ / FULL SCREEN) --- */}
+      <AnimatePresence>
+        {expandedDemo && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8, borderRadius: '4rem' }}
+            animate={{ opacity: 1, scale: 1, borderRadius: '0rem' }}
+            exit={{ opacity: 0, scale: 0.8, borderRadius: '4rem' }}
+            transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+            className={`fixed inset-0 z-[500] flex flex-col items-center justify-center overflow-hidden ${isLightTheme ? 'bg-[#150508]' : 'bg-[#050505]'}`}
           >
-            <X size={24} />
-          </button>
-
-          <div className="relative flex justify-center items-center">
-            
-            <div className={`relative w-[300px] sm:w-[340px] aspect-[9/19.5] max-h-[85vh] rounded-[3rem] sm:rounded-[3.5rem] border-[10px] sm:border-[14px] overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.5)] animate-in zoom-in-95 duration-500 transition-colors ${isLightTheme ? 'bg-black border-[#2A1116] shadow-[0_0_50px_rgba(216,160,166,0.15)]' : 'bg-black border-[#1f1f1f] shadow-[0_0_50px_rgba(255,255,255,0.05)]'}`}>
-              
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[90px] h-[26px] bg-black rounded-full z-30 shadow-[inset_0_0_2px_rgba(255,255,255,0.15)] flex justify-end items-center px-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#0a0a0a] border border-[#222]"></div>
+            {isDemoLoading && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                <Loader2 className={`w-10 h-10 animate-spin ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white/60'}`} />
+                <span className={`text-xs mt-4 uppercase tracking-[0.2em] font-medium ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white/40'}`}>
+                  Загрузка шаблона...
+                </span>
               </div>
+            )}
+            
+            <iframe
+              src={expandedDemo.demoLink}
+              onLoad={() => setIsDemoLoading(false)}
+              className="absolute inset-0 w-full h-full border-none z-20 bg-white"
+              title={expandedDemo.title}
+              sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+            />
 
-              <div className="absolute inset-0 z-20 pointer-events-none rounded-[2.5rem] shadow-[inset_0_0_10px_rgba(255,255,255,0.1)]"></div>
-
-              <AnimatePresence>
-                {isMediaLoading && (
-                  <motion.div 
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                    className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#050505] pt-[15px]"
-                  >
-                    <Loader2 className={`w-8 h-8 animate-spin ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white/60'}`} />
-                    <span className={`text-[10px] mt-4 uppercase tracking-[0.2em] font-medium ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white/40'}`}>
-                      Загрузка...
-                    </span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {activePhoto ? (
-                <>
-                  <div 
-                    className={`absolute inset-0 z-10 bg-black transition-opacity duration-500 flex overflow-x-auto snap-x snap-mandatory scrollbar-hide ${isMediaLoading ? 'opacity-0' : 'opacity-100'}`}
-                    onScroll={(e) => {
-                      const idx = Math.round(e.target.scrollLeft / e.target.offsetWidth);
-                      if (idx !== activePhotoIndex) {
-                        setActivePhotoIndex(idx);
-                      }
-                    }}
-                  >
-                    {(Array.isArray(activePhoto) ? activePhoto : [activePhoto]).map((url, i) => (
-                      <img
-                        key={i}
-                        src={url}
-                        alt={`Portfolio Story ${i + 1}`}
-                        onLoad={() => { if (i === 0) setIsMediaLoading(false); }}
-                        className="w-full h-full object-cover shrink-0 snap-center pt-[15px] scale-[1.02]"
-                      />
-                    ))}
-                  </div>
-                  
-                  {Array.isArray(activePhoto) && activePhoto.length > 1 && (
-                    <div className="absolute bottom-6 left-0 w-full z-30 flex justify-center gap-1.5 pointer-events-none">
-                      {activePhoto.map((_, i) => (
-                        <div 
-                          key={i} 
-                          className={`h-1.5 rounded-full transition-all duration-300 ${i === activePhotoIndex ? 'w-4 bg-white' : 'w-1.5 bg-white/40'}`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : activeVideo?.startsWith('demo') ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-[#0a0a0a]">
-                  <Play size={48} className="mb-4 opacity-20 text-white" />
-                  <p className="text-lg font-medium tracking-wide text-white">Скоро здесь будет новое видео</p>
-                  <p className="text-sm mt-2 text-white/50">Вставьте ссылку на видео в настройки (CONFIG)</p>
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30">
+              <button
+                onClick={() => {
+                  triggerHaptic('impact', 'light');
+                  setExpandedDemo(null);
+                  setTimeout(() => setIsDemoLoading(true), 300);
+                }}
+                className={`group px-6 py-4 rounded-[2rem] backdrop-blur-xl border flex items-center gap-3 shadow-[0_20px_40px_rgba(0,0,0,0.6)] active:scale-95 transition-all duration-300 ${isLightTheme ? 'bg-[#1A080C]/80 border-[#D8A0A6]/40 text-[#F5ECEE] hover:bg-[#1A080C]' : 'bg-[#151515]/80 border-white/20 text-white hover:bg-[#222]'}`}
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isLightTheme ? 'bg-[#D8A0A6]/20' : 'bg-white/10'}`}>
+                  <X size={16} />
                 </div>
-              ) : (
-                <iframe
-                  width="100%"
-                  height="100%"
-                  onLoad={() => setIsMediaLoading(false)}
-                  src={(() => {
-                    if (!activeVideo) return "";
-                    let url = activeVideo;
-                    if (url.includes("youtube.com/watch?v=")) return url.replace("watch?v=", "embed/").split("&")[0];
-                    if (url.includes("youtu.be/")) return url.replace("youtu.be/", "youtube.com/embed/").split("?")[0];
-                    if (url.includes("youtube.com/shorts/")) return url.replace("shorts/", "embed/").split("?")[0];
-                    
-                    if (url.includes("rutube.ru/")) {
-                      let id = "";
-                      const p = url.includes("?p=") ? "?p=" + url.split("?p=")[1].split("&")[0] : "";
-                      
-                      if (url.includes("/video/private/")) id = url.split("/video/private/")[1].split(/[/?]/)[0];
-                      else if (url.includes("/video/")) id = url.split("/video/")[1].split(/[/?]/)[0];
-                      else if (url.includes("/shorts/")) id = url.split("/shorts/")[1].split(/[/?]/)[0];
-                      
-                      if (id) return `https://rutube.ru/play/embed/${id}${p}`;
-                    }
-                    if (!url.startsWith("http")) return `https://rutube.ru/play/embed/${url}`; 
-                    
-                    return url;
-                  })()}
-                  frameBorder="0"
-                  allow="clipboard-write; autoplay"
-                  allowFullScreen
-                  className={`absolute inset-0 w-full h-full z-10 pt-[15px] scale-[1.02] bg-black transition-opacity duration-500 ${isMediaLoading ? 'opacity-0' : 'opacity-100'}`}
-                ></iframe>
-              )}
+                <span className="text-[11px] font-bold tracking-widest uppercase">
+                  Вернуться в портфолио
+                </span>
+              </button>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isOrderModalOpen && (
