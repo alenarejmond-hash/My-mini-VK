@@ -61,13 +61,13 @@ const CONFIG = {
   // icon - Иконка проекта (Можно писать: Compass, Heart, Flame, Star, Camera, Sparkles)
   // demoLink - 👈 ВСТАВЬТЕ СЮДА ССЫЛКУ НА ВАШ ШАБЛОН (загруженный на ваш хостинг)
   portfolio: [
-    { title: "ШОУРИЛ 2026", icon: Compass, demoLink: "https://dzen.ru/" }, // Замените ссылку на свою
-    { title: "БЛОГЕР", icon: Heart, demoLink: "https://vc.ru/" }, // Замените ссылку на свою
-    { title: "РЕЖИССЁР", icon: Heart, demoLink: "https://ru.wikipedia.org/" }, // Замените ссылку на свою
-    { title: "ТУРАГЕНТ", icon: Flame, demoLink: "https://github.com/alenarejmond-hash/schabl-turagent.git" }, // Замените ссылку на свою
-    { title: "АВТОРСКИЕ ТУРЫ", icon: Star, demoLink: "https://vc.ru/" }, // Замените ссылку на свою
-    { title: "ПСИХОЛОГ", icon: Camera, demoLink: "https://ru.wikipedia.org/" }, // Замените ссылку на свою
-    { title: "ЭЗОРЕТИК", icon: Sparkles, demoLink: "https://dzen.ru/" }, // Замените ссылку на свою
+    { title: "ШОУРИЛ 2026", icon: Compass, demoLink: "https://turagent.nice-app.ru/" }, // Замените ссылку на свою
+    { title: "БЛОГЕР", icon: Heart, demoLink: "https://turagent.nice-app.ru/" }, // Замените ссылку на свою
+    { title: "РЕЖИССЁР", icon: Heart, demoLink: "https://turagent.nice-app.ru/" }, // Замените ссылку на свою
+    { title: "ТУРАГЕНТ", icon: Flame, demoLink: "https://turagent.nice-app.ru/" }, // Замените ссылку на свою
+    { title: "АВТОРСКИЕ ТУРЫ", icon: Star, demoLink: "https://turagent.nice-app.ru/" }, // Замените ссылку на свою
+    { title: "ПСИХОЛОГ", icon: Camera, demoLink: "https://turagent.nice-app.ru/" }, // Замените ссылку на свою
+    { title: "ЭЗОРЕТИК", icon: Sparkles, demoLink: "https://turagent.nice-app.ru/" }, // Замените ссылку на свою
   ],
 
   // 7. Инвестиции (Тарифы) в стиле Apple Wallet
