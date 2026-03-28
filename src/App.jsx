@@ -1610,40 +1610,43 @@ export default function App() {
             animate={{ opacity: 1, scale: 1, borderRadius: '0rem' }}
             exit={{ opacity: 0, scale: 0.8, borderRadius: '4rem' }}
             transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-            className={`fixed inset-0 z-[500] flex flex-col items-center justify-center overflow-hidden ${isLightTheme ? 'bg-[#150508]' : 'bg-[#050505]'}`}
+            className={`fixed inset-0 z-[500] flex flex-col items-center justify-center p-6 overflow-hidden ${isLightTheme ? 'bg-[#150508]' : 'bg-[#050505]'}`}
           >
-            {isDemoLoading && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-                <Loader2 className={`w-10 h-10 animate-spin ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white/60'}`} />
-                <span className={`text-xs mt-4 uppercase tracking-[0.2em] font-medium ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white/40'}`}>
-                  Загрузка шаблона...
-                </span>
-              </div>
-            )}
-            
-            <iframe
-              src={expandedDemo.demoLink}
-              onLoad={() => setIsDemoLoading(false)}
-              className="absolute inset-0 w-full h-full border-none z-20 bg-white"
-              title={expandedDemo.title}
-              sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
-            />
+            {/* Декоративное свечение на фоне */}
+            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 opacity-10 blur-[100px] rounded-full pointer-events-none ${isLightTheme ? 'bg-[#D8A0A6]' : 'bg-white'}`}></div>
 
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30">
+            <div className="relative z-10 flex flex-col items-center text-center max-w-sm">
+              <div className={`w-20 h-20 rounded-full border flex items-center justify-center mb-8 animate-pulse shadow-[0_0_30px_rgba(255,255,255,0.05)] ${isLightTheme ? 'bg-[#D8A0A6]/10 border-[#D8A0A6]/30 text-[#D8A0A6]' : 'bg-white/5 border-white/10 text-white/80'}`}>
+                <Sparkles size={32} strokeWidth={1.5} />
+              </div>
+              
+              <h2 className={`text-2xl font-light tracking-wide mb-3 ${isLightTheme ? 'text-[#F5ECEE]' : 'text-white'}`}>
+                Симуляция готова
+              </h2>
+              <p className={`text-[13px] font-light leading-relaxed mb-10 ${isLightTheme ? 'text-[#F5ECEE]/60' : 'text-white/50'}`}>
+                Интерактивный прототип <strong className={`font-medium tracking-wide ${isLightTheme ? 'text-[#D8A0A6]' : 'text-white'}`}>«{expandedDemo.title}»</strong> откроется в новой вкладке для идеального погружения без искажений.
+              </p>
+
+              <button
+                onClick={() => {
+                  triggerHaptic('impact', 'medium');
+                  window.open(expandedDemo.demoLink, '_blank', 'noopener,noreferrer');
+                }}
+                className={`group relative w-full py-4.5 font-medium rounded-2xl transition-all duration-300 active:scale-[0.98] overflow-hidden flex items-center justify-center gap-3 mb-6 ${isLightTheme ? 'bg-[#D8A0A6] text-[#150508] shadow-[0_10px_30px_rgba(216,160,166,0.2)] hover:shadow-[0_10px_40px_rgba(216,160,166,0.3)]' : 'bg-white text-black shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_10px_40px_rgba(255,255,255,0.2)]'}`}
+              >
+                <span className="relative z-10 tracking-widest uppercase text-[11px] font-bold">Открыть Live-Демо</span>
+                <ArrowRight size={16} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+                <div className={`absolute inset-0 transition-transform duration-1000 translate-x-[-100%] group-hover:translate-x-[100%] ${isLightTheme ? 'bg-gradient-to-r from-transparent via-white/20 to-transparent' : 'bg-gradient-to-r from-transparent via-black/10 to-transparent'}`}></div>
+              </button>
+
               <button
                 onClick={() => {
                   triggerHaptic('impact', 'light');
                   setExpandedDemo(null);
-                  setTimeout(() => setIsDemoLoading(true), 300);
                 }}
-                className={`group px-6 py-4 rounded-[2rem] backdrop-blur-xl border flex items-center gap-3 shadow-[0_20px_40px_rgba(0,0,0,0.6)] active:scale-95 transition-all duration-300 ${isLightTheme ? 'bg-[#1A080C]/80 border-[#D8A0A6]/40 text-[#F5ECEE] hover:bg-[#1A080C]' : 'bg-[#151515]/80 border-white/20 text-white hover:bg-[#222]'}`}
+                className={`text-[10px] tracking-widest uppercase pb-1 border-b transition-colors active:scale-95 ${isLightTheme ? 'text-[#D8A0A6]/60 border-[#D8A0A6]/30 hover:text-[#D8A0A6]' : 'text-white/40 border-white/20 hover:text-white'}`}
               >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isLightTheme ? 'bg-[#D8A0A6]/20' : 'bg-white/10'}`}>
-                  <X size={16} />
-                </div>
-                <span className="text-[11px] font-bold tracking-widest uppercase">
-                  Вернуться в портфолио
-                </span>
+                Отменить и вернуться
               </button>
             </div>
           </motion.div>
