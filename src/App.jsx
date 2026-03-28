@@ -1630,7 +1630,28 @@ export default function App() {
               <button
                 onClick={() => {
                   triggerHaptic('impact', 'medium');
-                  window.open(expandedDemo.demoLink, '_blank', 'noopener,noreferrer');
+                  const url = expandedDemo.demoLink;
+                  
+                  if (window.vkBridge && isVK) {
+                    // Умное открытие для ВКонтакте
+                    window.vkBridge.send('VKWebAppOpenUrl', { url: url }).catch(() => {
+                      // Фолбэк на случай сбоя
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.target = '_blank';
+                      a.click();
+                    });
+                  } else if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
+                    // Умное открытие для Telegram
+                    window.Telegram.WebApp.openLink(url);
+                  } else {
+                    // Умное открытие для обычных браузеров
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.click();
+                  }
                 }}
                 className={`group relative w-full py-4.5 font-medium rounded-2xl transition-all duration-300 active:scale-[0.98] overflow-hidden flex items-center justify-center gap-3 mb-6 ${isLightTheme ? 'bg-[#D8A0A6] text-[#150508] shadow-[0_10px_30px_rgba(216,160,166,0.2)] hover:shadow-[0_10px_40px_rgba(216,160,166,0.3)]' : 'bg-white text-black shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_10px_40px_rgba(255,255,255,0.2)]'}`}
               >
